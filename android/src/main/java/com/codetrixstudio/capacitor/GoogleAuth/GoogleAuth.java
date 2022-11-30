@@ -43,6 +43,10 @@ public class GoogleAuth extends Plugin {
   private final static String FIELD_TOKEN_EXPIRES_IN = "expires_in";
   private final static String FIELD_ACCESS_TOKEN = "accessToken";
   private final static String FIELD_TOKEN_EXPIRES = "expires";
+  
+  // see https://developers.google.com/android/reference/com/google/android/gms/auth/api/signin/GoogleSignInStatusCodes#SIGN_IN_CANCELLED
+  private final static int SIGN_IN_CANCELLED = 12501;
+
   public static final int KAssumeStaleTokenSec = 60;
 
   private GoogleSignInClient googleSignInClient;
@@ -50,8 +54,8 @@ public class GoogleAuth extends Plugin {
   @Override
   public void load() {
     String clientId = getConfig().getString("androidClientId",
-            getConfig().getString("clientId",
-                    this.getContext().getString(R.string.server_client_id)));
+      getConfig().getString("clientId",
+              this.getContext().getString(R.string.server_client_id)));
 
     boolean forceCodeForRefreshToken = getConfig().getBoolean("forceCodeForRefreshToken", false);
 
@@ -121,7 +125,11 @@ public class GoogleAuth extends Plugin {
         }
       });
     } catch (ApiException e) {
-      call.reject("Something went wrong", e);
+      if (SIGN_IN_CANCELLED == e.getStatusCode()) {
+        call.reject("The user canceled the sign-in flow.", "" + e.getStatusCode());
+      } else {
+        call.reject("Something went wrong", "" + e.getStatusCode());
+      }
     }
   }
 
