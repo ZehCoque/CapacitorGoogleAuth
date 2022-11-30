@@ -135,7 +135,22 @@ public class GoogleAuth extends Plugin {
 
   @PluginMethod()
   public void refresh(final PluginCall call) {
-    call.reject("I don't know how to refresh token on Android");
+    Task<GoogleSignInAccount> task = googleSignInClient.silentSignIn();
+    if (task.isSuccessful()) {
+      extractUserFromAccount(task.getResult(), call);
+    }
+    task.addOnCompleteListener(task1 -> {
+      try {
+        extractUserFromAccount(task1.getResult(ApiException.class), call);
+      } catch (ApiException e) {
+        // You can get from apiException.getStatusCode() the detailed error code
+        // e.g. GoogleSignInStatusCodes.SIGN_IN_REQUIRED means user needs to take
+        // explicit action to finish sign-in;
+        // Please refer to GoogleSignInStatusCodes Javadoc for details
+        e.printStackTrace();
+        call.reject("Something went wrong with silent sign in", e);
+      }
+    });
   }
 
   @PluginMethod()
@@ -205,5 +220,36 @@ public class GoogleAuth extends Plugin {
     }
     reader.close();
     return sb.toString();
+  }
+
+  private void extractUserFromAccount(GoogleSignInAccount account, final PluginCall call) {
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    JSObject user = new JSObject();
+    executor.execute(() -> {
+      try {
+        JSONObject accessTokenObject = getAuthToken(account.getAccount(), true);
+
+        JSObject authentication = new JSObject();
+        authentication.put("idToken", account.getIdToken());
+        authentication.put(FIELD_ACCESS_TOKEN, accessTokenObject.get(FIELD_ACCESS_TOKEN));
+        authentication.put(FIELD_TOKEN_EXPIRES, accessTokenObject.get(FIELD_TOKEN_EXPIRES));
+        authentication.put(FIELD_TOKEN_EXPIRES_IN, accessTokenObject.get(FIELD_TOKEN_EXPIRES_IN));
+
+        user.put("serverAuthCode", account.getServerAuthCode());
+        user.put("idToken", account.getIdToken());
+        user.put("authentication", authentication);
+
+        user.put("displayName", account.getDisplayName());
+        user.put("email", account.getEmail());
+        user.put("familyName", account.getFamilyName());
+        user.put("givenName", account.getGivenName());
+        user.put("id", account.getId());
+        user.put("imageUrl", account.getPhotoUrl());
+        call.resolve(user);
+      } catch (Exception e) {
+        e.printStackTrace();
+        call.reject("Unable to fetch access token ");
+      }
+    });
   }
 }
