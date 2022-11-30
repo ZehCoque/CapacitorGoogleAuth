@@ -55,7 +55,7 @@ public class GoogleAuth extends Plugin {
   public void load() {
     String clientId = getConfig().getString("androidClientId",
       getConfig().getString("clientId",
-      this.getContext().getString(R.string.server_client_id)));
+        this.getContext().getString(R.string.server_client_id)));
 
     boolean forceCodeForRefreshToken = getConfig().getBoolean("forceCodeForRefreshToken", false);
 
