@@ -136,9 +136,6 @@ public class GoogleAuth extends Plugin {
   @PluginMethod()
   public void refresh(final PluginCall call) {
     Task<GoogleSignInAccount> task = googleSignInClient.silentSignIn();
-    if (task.isSuccessful()) {
-      extractUserFromAccount(task.getResult(), call);
-    }
     task.addOnCompleteListener(task1 -> {
       try {
         extractUserFromAccount(task1.getResult(ApiException.class), call);
