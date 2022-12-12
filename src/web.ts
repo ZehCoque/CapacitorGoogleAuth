@@ -41,7 +41,7 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
     }
   ) {
     if (typeof window === 'undefined') {
-      return;
+      return Promise.reject('GoogleAuthPlugin - window is undefined');;
     }
 
     const metaClientId = (document.getElementsByName('google-signin-client_id')[0] as any)?.content;
@@ -63,7 +63,7 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
       this.loadScript();
     });
 
-    this.addUserChangeListener();
+    return this.addUserChangeListener();
   }
 
   platformJsLoaded() {
