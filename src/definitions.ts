@@ -92,5 +92,5 @@ export interface GoogleAuthPlugin {
    * Init hook for load gapi and init plugin
    * @since 3.1.0
    * */
-  initialize(options?: Partial<InitOptions>): void;
+  initialize(options?: Partial<InitOptions>): Promise<void>;
 }
