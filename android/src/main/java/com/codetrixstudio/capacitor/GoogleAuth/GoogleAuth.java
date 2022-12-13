@@ -227,22 +227,13 @@ public class GoogleAuth extends Plugin {
         JSONObject accessTokenObject = getAuthToken(account.getAccount(), true);
 
         JSObject authentication = new JSObject();
-        authentication.put("idToken", account.getIdToken());
+        authentication.put("token", account.getIdToken());
         authentication.put(FIELD_ACCESS_TOKEN, accessTokenObject.get(FIELD_ACCESS_TOKEN));
-        authentication.put(FIELD_TOKEN_EXPIRES, accessTokenObject.get(FIELD_TOKEN_EXPIRES));
+        authentication.put("expires_at", accessTokenObject.get(FIELD_TOKEN_EXPIRES));
         authentication.put(FIELD_TOKEN_EXPIRES_IN, accessTokenObject.get(FIELD_TOKEN_EXPIRES_IN));
+        authentication.put("idToken", account.getIdToken());
 
-        user.put("serverAuthCode", account.getServerAuthCode());
-        user.put("idToken", account.getIdToken());
-        user.put("authentication", authentication);
-
-        user.put("displayName", account.getDisplayName());
-        user.put("email", account.getEmail());
-        user.put("familyName", account.getFamilyName());
-        user.put("givenName", account.getGivenName());
-        user.put("id", account.getId());
-        user.put("imageUrl", account.getPhotoUrl());
-        call.resolve(user);
+        call.resolve(authentication);
       } catch (Exception e) {
         e.printStackTrace();
         call.reject("Unable to fetch access token ");
