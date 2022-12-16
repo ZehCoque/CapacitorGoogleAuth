@@ -100,7 +100,9 @@ public class GoogleAuth: CAPPlugin {
                 let authenticationData: [String: Any] = [
                     "accessToken": authentication.accessToken,
                     "idToken": authentication.idToken ?? NSNull(),
-                    "refreshToken": authentication.refreshToken
+                    "refreshToken": authentication.refreshToken,
+                    "token": authentication.idToken ?? NSNull(),
+                    "expires_at": Int64(authentication.accessTokenExpirationDate.timeIntervalSince1970 * 1000)
                 ]
                 call.resolve(authenticationData);
             }
