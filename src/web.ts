@@ -150,6 +150,8 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
     user.authentication = {
       accessToken: authResponse.access_token,
       idToken: authResponse.id_token,
+      token: authResponse.id_token,
+      expires_at: authResponse.expires_at,
       refreshToken: '',
     };
 
