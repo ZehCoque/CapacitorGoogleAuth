@@ -22,6 +22,8 @@ export interface User {
 export interface Authentication {
   accessToken: string;
   idToken: string;
+  token: string;
+  expires_at: number;
 
   /**
    * refreshToken only for iOS and Android
