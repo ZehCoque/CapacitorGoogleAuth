@@ -46,6 +46,16 @@ public class GoogleAuth extends Plugin {
 
   // see https://developers.google.com/android/reference/com/google/android/gms/auth/api/signin/GoogleSignInStatusCodes#SIGN_IN_CANCELLED
   private final static int SIGN_IN_CANCELLED = 12501;
+  private final static int API_NOT_CONNECTED = 17;
+  private final static int CANCELED = 16;
+  private final static int CONNECTION_SUSPENDED_DURING_CALL = 20;
+  private final static int DEVELOPER_ERROR = 10;
+  private final static int ERROR = 13;
+  private final static int INTERNAL_ERROR = 8;
+  private final static int INVALID_ACCOUNT = 5;
+  private final static int INTERRUPTED = 14;
+  private final static int NETWORK_ERROR = 7;
+  private final static int SERVICE_VERSION_UPDATE_REQUIRED = 2;
 
   public static final int KAssumeStaleTokenSec = 60;
 
@@ -128,7 +138,7 @@ public class GoogleAuth extends Plugin {
       if (SIGN_IN_CANCELLED == e.getStatusCode()) {
         call.reject("The user canceled the sign-in flow.", "" + e.getStatusCode());
       } else {
-        call.reject("Something went wrong", "" + e.getStatusCode());
+        call.reject("Error code: " + e.getStatusCode(), "" + e.getStatusCode());
       }
     }
   }
