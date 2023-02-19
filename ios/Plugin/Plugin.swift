@@ -14,19 +14,21 @@ public class GoogleAuth: CAPPlugin {
     var forceAuthCode: Bool = false;
     var additionalScopes: [String]!;
 
-    
+
     public override func load() {
         googleSignIn = GIDSignIn.sharedInstance;
-        
+
         let serverClientId = getServerClientIdValue();
-        
+
         guard let clientId = getClientIdValue() else {
             NSLog("no client id found in config")
             return;
         }
 
         googleSignInConfiguration = GIDConfiguration.init(clientID: clientId, serverClientID: serverClientId)
-        
+
+        googleSignIn.restorePreviousSignIn()
+
         // these are scopes granted by default by the signIn method
         let defaultGrantedScopes = ["email", "profile", "openid"];
 
@@ -34,7 +36,7 @@ public class GoogleAuth: CAPPlugin {
         additionalScopes = (getConfigValue("scopes") as? [String] ?? []).filter {
             return !defaultGrantedScopes.contains($0);
         };
-                
+
         if let forceAuthCodeConfig = getConfigValue("forceCodeForRefreshToken") as? Bool {
             forceAuthCode = forceAuthCodeConfig;
         }
@@ -61,7 +63,7 @@ public class GoogleAuth: CAPPlugin {
                 }
             } else {
                 let presentingVc = self.bridge!.viewController!;
-                
+
                 self.googleSignIn.signIn(with: self.googleSignInConfiguration, presenting: presentingVc) { user, error in
                     if let error = error {
                         self.signInCall?.reject(error.localizedDescription, "\(error._code)");
@@ -129,8 +131,8 @@ public class GoogleAuth: CAPPlugin {
         }
         googleSignIn.handle(url);
     }
-    
-    
+
+
     func getClientIdValue() -> String? {
         if let clientId = getConfigValue("iosClientId") as? String {
             return clientId;
@@ -145,7 +147,7 @@ public class GoogleAuth: CAPPlugin {
         }
         return nil;
     }
-    
+
     func getServerClientIdValue() -> String? {
         if let serverClientId = getConfigValue("serverClientId") as? String {
             return serverClientId;
