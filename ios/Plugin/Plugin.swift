@@ -90,7 +90,7 @@ public class GoogleAuth: CAPPlugin {
         DispatchQueue.main.async {
             
             if self.googleSignIn.currentUser == nil {
-                googleSignIn.restorePreviousSignIn() { user, error in
+                self.googleSignIn.restorePreviousSignIn() { user, error in
                     if let error = error {
                         NSLog("error restoring previous sign in: \(error.localizedDescription)");
                         return;
