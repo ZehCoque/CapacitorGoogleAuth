@@ -89,20 +89,23 @@ public class GoogleAuth: CAPPlugin {
     func refresh(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             
-            googleSignIn.restorePreviousSignIn() { user, error in
-                if let error = error {
-                    NSLog("error restoring previous sign in: \(error.localizedDescription)");
-                    return;
-                }
-                if let user = user {
-                    NSLog("restored previous sign in: \(user.userID ?? "no user id")");
+            if self.googleSignIn.currentUser == nil {
+                googleSignIn.restorePreviousSignIn() { user, error in
+                    if let error = error {
+                        NSLog("error restoring previous sign in: \(error.localizedDescription)");
+                        return;
+                    }
+                    if let user = user {
+                        NSLog("restored previous sign in: \(user.userID ?? "no user id")");
+                    }
                 }
             }
             
             if self.googleSignIn.currentUser == nil {
                 call.reject("User not logged in.");
-                return
+                return;
             }
+            
             self.googleSignIn.currentUser!.authentication.do { (authentication, error) in
                 guard let authentication = authentication else {
                     call.reject(error?.localizedDescription ?? "Something went wrong.");
