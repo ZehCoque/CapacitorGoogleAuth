@@ -27,16 +27,6 @@ public class GoogleAuth: CAPPlugin {
 
         googleSignInConfiguration = GIDConfiguration.init(clientID: clientId, serverClientID: serverClientId)
 
-        googleSignIn.restorePreviousSignIn() { user, error in
-            if let error = error {
-                NSLog("error restoring previous sign in: \(error.localizedDescription)");
-                return;
-            }
-            if let user = user {
-                NSLog("restored previous sign in: \(user.userID ?? "no user id")");
-            }
-        }
-
         // these are scopes granted by default by the signIn method
         let defaultGrantedScopes = ["email", "profile", "openid"];
 
@@ -98,6 +88,17 @@ public class GoogleAuth: CAPPlugin {
     @objc
     func refresh(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
+            
+            googleSignIn.restorePreviousSignIn() { user, error in
+                if let error = error {
+                    NSLog("error restoring previous sign in: \(error.localizedDescription)");
+                    return;
+                }
+                if let user = user {
+                    NSLog("restored previous sign in: \(user.userID ?? "no user id")");
+                }
+            }
+            
             if self.googleSignIn.currentUser == nil {
                 call.reject("User not logged in.");
                 return
